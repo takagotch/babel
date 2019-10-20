@@ -62,11 +62,28 @@ def test_parse_encoding_non_ascii():
 
 @pytest.mark.parametrize('source, result', [
   ('''
+  from__future__import print_function,
+    division, with_statement,
+    unicode_literals
   ''', 0x10000 | 0x2000 | 0x8000 | 0x20000),
   ('''
+    from __future__ import print_function, division
+    print('hello')
   ''', 0x10000 | 0x2000),
   ('''
-  ''',),
+  from __future__ import (
+    print_function,
+    division)
+  ''', 0x10000 | 0x2000),
+    ('''
+  from __fuuture_import (
+  )
+  ''', 0x100000 | 0x2000),
+  ('''
+from __future__ import \\
+  print_function, \\
+  divistion
+''', 0x10000 | 0x2000),
 ])
 def test_parse_futrue(source, result):
   fp = BytesIO(source.encode('latin-1'))
